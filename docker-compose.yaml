@@ -9,25 +9,40 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./trainingPG/migrations:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U training_user -d training_db"]
       interval: 5s
       timeout: 5s
       retries: 10
 
+  migrate:
+    build:
+      context: ./trainingPG/migrations
+      dockerfile: Dockerfile
+    environment:
+      GOOSE_DRIVER: postgres
+      GOOSE_DBSTRING: postgres://training_user:123@postgres:5432/training_db?sslmode=disable
+      GOOSE_MIGRATION_DIR: /migrations
+    volumes:
+      - ./trainingPG/migrations:/migrations:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["up"]
+
   app:
     build: ./trainingPG
     ports:
       - "8080:8080"
-    env_file:
-      - ./trainingPG/.env.dev
     environment:
+      PG_USER: training_user
+      PG_PASSWORD: "123"
       PG_HOST: postgres
+      PG_PORT: "5432"
       PG_NAME: training_db
     depends_on:
-      postgres:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
 
 volumes:
   postgres_data:

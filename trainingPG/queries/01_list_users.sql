@@ -1,0 +1,3 @@
+SELECT name, email
+FROM users
+ORDER BY name ASC;
