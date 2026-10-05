@@ -1,0 +1,1 @@
+SELECT id, (check_out - check_in) AS nights FROM bookings;

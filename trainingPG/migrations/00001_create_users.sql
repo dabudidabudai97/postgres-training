@@ -1,3 +1,5 @@
+-- +goose Up
+
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE IF NOT EXISTS users (
@@ -6,3 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR NOT NULL UNIQUE,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
+
+-- +goose Down
+
+DROP TABLE IF EXISTS users;
