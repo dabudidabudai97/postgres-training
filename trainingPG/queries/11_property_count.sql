@@ -1,0 +1,1 @@
+SELECT count(*) AS property_count FROM properties;
